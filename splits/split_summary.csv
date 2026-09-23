@@ -1,0 +1,5 @@
+strategy,split,merchant_count,image_count,image_fraction,regions_present
+random_stratified_80_20,train,27,2333,0.798699,GD;HLJ;HN;JL;LN;SD;UNKNOWN;YN
+random_stratified_80_20,test,27,588,0.201301,GD;HLJ;HN;JL;LN;SD;UNKNOWN;YN
+leave_merchants_out,train,20,2357,0.806915,GD;HLJ;HN;JL;LN;SD;UNKNOWN;YN
+leave_merchants_out,test,7,564,0.193085,GD;HLJ;HN;LN;SD;YN

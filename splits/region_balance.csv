@@ -1,0 +1,17 @@
+strategy,region_label,total_images,train_images,test_images,test_image_fraction,total_merchants,train_merchants,test_merchants,merchant_overlap
+random_stratified_80_20,GD,338,270,68,0.201183,5,5,5,5
+random_stratified_80_20,HLJ,226,180,46,0.20354,2,2,2,2
+random_stratified_80_20,HN,494,395,99,0.200405,6,6,6,6
+random_stratified_80_20,JL,233,186,47,0.201717,1,1,1,1
+random_stratified_80_20,LN,401,320,81,0.201995,4,4,4,4
+random_stratified_80_20,SD,395,316,79,0.2,3,3,3,3
+random_stratified_80_20,UNKNOWN,12,9,3,0.25,1,1,1,1
+random_stratified_80_20,YN,822,657,165,0.20073,5,5,5,5
+leave_merchants_out,GD,338,267,71,0.210059,5,3,2,0
+leave_merchants_out,HLJ,226,184,42,0.185841,2,1,1,0
+leave_merchants_out,HN,494,401,93,0.188259,6,5,1,0
+leave_merchants_out,JL,233,233,0,0.0,1,1,0,0
+leave_merchants_out,LN,401,300,101,0.25187,4,3,1,0
+leave_merchants_out,SD,395,290,105,0.265823,3,2,1,0
+leave_merchants_out,UNKNOWN,12,12,0,0.0,1,1,0,0
+leave_merchants_out,YN,822,670,152,0.184915,5,4,1,0
