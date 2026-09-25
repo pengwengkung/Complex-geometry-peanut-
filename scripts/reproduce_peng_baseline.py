@@ -41,7 +41,7 @@ import json
 import random
 import time
 import warnings
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Iterable
@@ -105,6 +105,9 @@ def parse_args() -> argparse.Namespace:
                         default=Path("splits/random_stratified_80_20.csv"))
     parser.add_argument("--partition", choices=("train", "all"), default="train",
                         help="CV data: standard-split train side, or all rows.")
+    parser.add_argument("--exclude-label", action="append", default=[],
+                        help="Exclude a label before validation; repeat for multiple labels. "
+                             "Useful for UNKNOWN labels that are not paper regions.")
     parser.add_argument("--backbone", choices=("inception_v3", "resnet50"),
                         default="inception_v3")
     parser.add_argument("--out-dir", type=Path, default=Path("baseline_results"))
@@ -394,6 +397,18 @@ def main() -> None:
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     rows = read_split_rows(args.split_csv, args.partition)
+    if args.exclude_label:
+        excluded = set(args.exclude_label)
+        rows = [row for row in rows if row["region_label"] not in excluded]
+        print(f"Excluded labels: {sorted(excluded)}")
+    class_counts = Counter(row["region_label"] for row in rows)
+    too_small = {label: count for label, count in class_counts.items() if count < 10}
+    if too_small:
+        raise ValueError(
+            "10-fold cross-validation requires at least 10 crops per label. "
+            f"Too-small labels: {too_small}. Use --partition all, or explicitly "
+            "exclude labels that are not valid paper regions with --exclude-label."
+        )
     paths = resolve_image_paths(args.cnn_root, rows)
     label_encoder = LabelEncoder()
     y = label_encoder.fit_transform([row["region_label"] for row in rows])
@@ -507,6 +522,7 @@ def main() -> None:
     metadata = {
         "backbone": args.backbone,
         "partition": args.partition,
+        "excluded_labels": args.exclude_label,
         "split_csv": str(args.split_csv.resolve()),
         "cnn_root": str(args.cnn_root.resolve()),
         "selected_crops": len(rows),
