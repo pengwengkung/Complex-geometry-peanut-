@@ -310,17 +310,20 @@ def score_matrix(estimator, X_test: np.ndarray) -> np.ndarray:
 
 
 def auc_from_scores(y_true: np.ndarray, scores: np.ndarray, n_classes: int) -> float:
-    # Every requested split is stratified, so every class is represented in the
-    # aggregated scores.  The result is macro one-vs-rest AUC across region labels.
-    return float(
-        roc_auc_score(
-            y_true,
-            scores,
-            labels=np.arange(n_classes),
-            multi_class="ovr",
-            average="macro",
-        )
-    )
+    # Compute one binary ROC-AUC per class and average them.  This accepts both
+    # probabilities (kNN/RF/LR/MLP) and raw decision scores (SVM).  Passing raw
+    # SVM scores directly to sklearn's multiclass roc_auc_score is rejected by
+    # recent sklearn versions because that entry point requires probabilities.
+    one_vs_rest = []
+    for class_index in range(n_classes):
+        binary_truth = (y_true == class_index).astype(np.int8)
+        if np.unique(binary_truth).size < 2:
+            raise ValueError(
+                f"Cannot calculate AUC for class {class_index}: "
+                "the evaluation set contains only one class state."
+            )
+        one_vs_rest.append(roc_auc_score(binary_truth, scores[:, class_index]))
+    return float(np.mean(one_vs_rest))
 
 
 def evaluate_10fold(
